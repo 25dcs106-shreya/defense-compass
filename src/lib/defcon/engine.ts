@@ -1,4 +1,4 @@
-import { ASSETS, INCIDENTS, MITRE, THREAT_ACTORS } from "./data";
+import { ASSETS, INCIDENTS, MITRE, RAW_ALERTS, THREAT_ACTORS } from "./data";
 import type { Asset, AssetStatus, Incident, Severity } from "./types";
 
 /**
@@ -299,17 +299,11 @@ export function riskFactorBreakdown(assetId: string, state: WorldState) {
   };
 }
 
-export function mitreFor(incident: Incident) {
-  const ids = new Set(
-    incident.alertIds.map((id) => id).map((id) => id),
-  );
-  void ids;
-  return MITRE.filter((m) => incident.correlationBasis.join(" ").includes(m.id) || true).filter((m) =>
-    incidentTechniques(incident).includes(m.id),
-  );
+export function incidentTechniques(incident: Incident): string[] {
+  return [...new Set(RAW_ALERTS.filter((a) => incident.alertIds.includes(a.id)).map((a) => a.technique))];
 }
 
-export function incidentTechniques(incident: Incident): string[] {
-  const { RAW_ALERTS } = require("./data") as { RAW_ALERTS: { id: string; technique: string }[] };
-  return [...new Set(RAW_ALERTS.filter((a) => incident.alertIds.includes(a.id)).map((a) => a.technique))];
+export function mitreFor(incident: Incident) {
+  const techniques = incidentTechniques(incident);
+  return MITRE.filter((m) => techniques.includes(m.id));
 }
