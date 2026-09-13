@@ -142,3 +142,73 @@
     color: var(--color-foreground);
   }
 }
+
+/* ── DEFCON-X tactical command theme ───────────────────────────── */
+:root {
+  --background: oklch(0.17 0.022 250);
+  --foreground: oklch(0.96 0.005 250);
+  --card: oklch(0.215 0.024 250);
+  --card-foreground: oklch(0.96 0.005 250);
+  --popover: oklch(0.205 0.024 250);
+  --popover-foreground: oklch(0.96 0.005 250);
+  --primary: oklch(0.78 0.17 82);
+  --primary-foreground: oklch(0.18 0.03 80);
+  --secondary: oklch(0.27 0.028 250);
+  --secondary-foreground: oklch(0.95 0.005 250);
+  --muted: oklch(0.26 0.026 250);
+  --muted-foreground: oklch(0.72 0.02 250);
+  --accent: oklch(0.3 0.04 215);
+  --accent-foreground: oklch(0.96 0.005 250);
+  --destructive: oklch(0.62 0.22 25);
+  --destructive-foreground: oklch(0.98 0.005 250);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 16%);
+  --ring: oklch(0.78 0.17 82);
+  --chart-1: oklch(0.78 0.17 82);
+  --chart-2: oklch(0.72 0.16 190);
+  --chart-3: oklch(0.62 0.22 25);
+  --chart-4: oklch(0.75 0.18 145);
+  --chart-5: oklch(0.68 0.14 280);
+  --sidebar: oklch(0.195 0.024 250);
+  --sidebar-foreground: oklch(0.93 0.005 250);
+  --sidebar-primary: oklch(0.78 0.17 82);
+  --sidebar-primary-foreground: oklch(0.18 0.03 80);
+  --sidebar-accent: oklch(0.27 0.03 250);
+  --sidebar-accent-foreground: oklch(0.96 0.005 250);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.78 0.17 82);
+  --crit: oklch(0.63 0.23 25);
+  --high: oklch(0.74 0.18 55);
+  --medium: oklch(0.82 0.16 92);
+  --low: oklch(0.74 0.15 175);
+  --ok: oklch(0.75 0.18 150);
+  --grid: oklch(1 0 0 / 6%);
+}
+
+@theme inline {
+  --color-crit: var(--crit);
+  --color-high: var(--high);
+  --color-medium: var(--medium);
+  --color-low: var(--low);
+  --color-ok: var(--ok);
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+@utility grid-bg {
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 42px 42px;
+}
+
+@utility scan-pulse {
+  animation: dfx-pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes dfx-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+@source inline("{text,bg,border}-{crit,high,medium,low,ok}");
+@source inline("text-foreground bg-foreground");
