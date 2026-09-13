@@ -12,7 +12,7 @@ interface Msg {
   text: string;
   sources?: string[];
   confidence?: number;
-  link?: { to: string; label: string };
+  link?: { kind: "incident" | "twin" | "command" | "simulator" | "intel"; id?: string; label: string };
 }
 
 const SUGGESTIONS = [
@@ -48,7 +48,7 @@ export function CopilotPanel({ onClose }: { onClose?: () => void }) {
             text: `${incMatch.id} — ${incMatch.title} on ${incMatch.assetId}. ${incMatch.alertIds.length} raw alerts were correlated on: ${incMatch.correlationBasis.slice(0, 3).join("; ")}. Threat score ${incMatch.threatScore}/100, correlation confidence ${incMatch.confidence}%. Recommended next step: validate the account, review endpoint telemetry and inspect outbound sessions. Analyst confirmation is required before any containment action.`,
             sources: ["Correlation Engine", "DOC-004 Incident Response SOP", "DOC-005 APT-X7 Tradecraft"],
             confidence: incMatch.confidence,
-            link: { to: `/incidents/${incMatch.id}`, label: `Open ${incMatch.id}` },
+            link: { kind: "incident", id: incMatch.id, label: `Open ${incMatch.id}` },
           };
         }
 
@@ -59,7 +59,7 @@ export function CopilotPanel({ onClose }: { onClose?: () => void }) {
             text: `${assetMatch.type} ${assetMatch.id} (${assetMatch.functionName}) is ${assetMatch.status}. Mission risk ${assetMatch.missionRisk}/100, readiness ${assetMatch.readiness}%. Physical health ${assetMatch.health}%, cyber risk ${assetMatch.effectiveCyberRisk}, maintenance risk ${assetMatch.effectiveMaintenanceRisk}.${c ? ` Highest predicted component failure: ${c.name} at ${c.failureProbability}% within ${c.window} — driven by ${c.factors[0].toLowerCase()}.` : ""} Mission criticality is ${assetMatch.criticality}/100.`,
             sources: ["Risk Engine", "HUMS Telemetry", ...KB_DOCUMENTS.filter((d) => d.assetId === assetMatch.id).map((d) => `${d.id} ${d.title}`)],
             confidence: 88,
-            link: { to: `/twin/${assetMatch.id}`, label: `Open digital twin ${assetMatch.id}` },
+            link: { kind: "twin", id: assetMatch.id, label: `Open digital twin ${assetMatch.id}` },
           };
         }
 
@@ -69,7 +69,7 @@ export function CopilotPanel({ onClose }: { onClose?: () => void }) {
             text: `${MISSION.name} readiness is ${readiness.overall}% (${readiness.band}). Contributions: physical ${readiness.physical}%, cyber ${readiness.cyber}%, maintenance ${readiness.maintenance}%, availability ${readiness.availability}%, intelligence risk ${readiness.intelligenceRisk}/100. The largest single detractor is ${impacts[0]?.assetId ?? "n/a"} (${impacts[0]?.impact ?? "nominal"}).`,
             sources: ["Readiness Model", "Mission Impact Engine"],
             confidence: 92,
-            link: { to: "/command", label: "Open command center" },
+            link: { kind: "command", label: "Open command center" },
           };
         }
 
@@ -80,7 +80,7 @@ export function CopilotPanel({ onClose }: { onClose?: () => void }) {
             text: `Top priorities right now:\n${p.map((x) => `${x.rank}. ${x.assetName} — ${x.problem} (${x.scoreLabel}). ${x.reason}`).join("\n")}\nAll actions require human confirmation.`,
             sources: ["Prioritisation Engine", "Correlation Engine", "Predictive Model"],
             confidence: 90,
-            link: { to: "/command", label: "Open priority queue" },
+            link: { kind: "command", label: "Open priority queue" },
           };
         }
 
@@ -90,7 +90,7 @@ export function CopilotPanel({ onClose }: { onClose?: () => void }) {
             text: `Use the simulator to model that. As a preview: removing the highest-risk asset from the mission changes readiness by roughly ${impacts[0]?.readinessDelta ?? 0} points and degrades "${impacts[0]?.functionName ?? "mission"}" capability. The simulator recalculates the full weighted model including standby substitution.`,
             sources: ["What-If Engine"],
             confidence: 84,
-            link: { to: "/simulator", label: "Open what-if simulator" },
+            link: { kind: "simulator", label: "Open what-if simulator" },
           };
         }
 
@@ -100,7 +100,7 @@ export function CopilotPanel({ onClose }: { onClose?: () => void }) {
             text: `Highest-confidence attribution is APT-X7 at 87% confidence, associated with R-04 and C-12 through valid-account abuse (T1078), encoded PowerShell (T1059.001), credential access (T1003) and web-protocol C2 (T1071.001). Attribution is probabilistic and modelled on synthetic data.`,
             sources: ["Threat Intelligence Feed", "DOC-005 APT-X7 Tradecraft"],
             confidence: 87,
-            link: { to: "/intel", label: "Open threat intelligence" },
+            link: { kind: "intel", label: "Open threat intelligence" },
           };
         }
 
@@ -160,14 +160,7 @@ export function CopilotPanel({ onClose }: { onClose?: () => void }) {
                   CONFIDENCE {m.confidence}% · DECISION SUPPORT ONLY — HUMAN APPROVAL REQUIRED
                 </p>
               )}
-              {m.link && (
-                <Link
-                  to={m.link.to}
-                  className="mt-2 inline-block font-mono text-[11px] text-primary underline underline-offset-4"
-                >
-                  {m.link.label} →
-                </Link>
-              )}
+              {m.link && <CopilotLink link={m.link} />}
             </div>
           </div>
         ))}
@@ -204,5 +197,38 @@ export function CopilotPanel({ onClose }: { onClose?: () => void }) {
         </form>
       </div>
     </div>
+  );
+}
+
+function CopilotLink({ link }: { link: NonNullable<Msg["link"]> }) {
+  const cls = "mt-2 inline-block font-mono text-[11px] text-primary underline underline-offset-4";
+  if (link.kind === "incident" && link.id)
+    return (
+      <Link to="/incidents/$incidentId" params={{ incidentId: link.id }} className={cls}>
+        {link.label} →
+      </Link>
+    );
+  if (link.kind === "twin" && link.id)
+    return (
+      <Link to="/twin/$assetId" params={{ assetId: link.id }} className={cls}>
+        {link.label} →
+      </Link>
+    );
+  if (link.kind === "simulator")
+    return (
+      <Link to="/simulator" className={cls}>
+        {link.label} →
+      </Link>
+    );
+  if (link.kind === "intel")
+    return (
+      <Link to="/intel" className={cls}>
+        {link.label} →
+      </Link>
+    );
+  return (
+    <Link to="/command" className={cls}>
+      {link.label} →
+    </Link>
   );
 }
