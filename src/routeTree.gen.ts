@@ -10,33 +10,115 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CommandRouteImport } from './routes/command'
+import { Route as FleetRouteImport } from './routes/fleet'
+import { Route as MaintenanceRouteImport } from './routes/maintenance'
+import { Route as IncidentsIndexRouteImport } from './routes/incidents.index'
+import { Route as IncidentsIncidentIdRouteImport } from './routes/incidents.$incidentId'
+import { Route as TwinAssetIdRouteImport } from './routes/twin.$assetId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CommandRoute = CommandRouteImport.update({
+  id: '/command',
+  path: '/command',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FleetRoute = FleetRouteImport.update({
+  id: '/fleet',
+  path: '/fleet',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MaintenanceRoute = MaintenanceRouteImport.update({
+  id: '/maintenance',
+  path: '/maintenance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IncidentsIndexRoute = IncidentsIndexRouteImport.update({
+  id: '/incidents/',
+  path: '/incidents/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IncidentsIncidentIdRoute = IncidentsIncidentIdRouteImport.update({
+  id: '/incidents/$incidentId',
+  path: '/incidents/$incidentId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TwinAssetIdRoute = TwinAssetIdRouteImport.update({
+  id: '/twin/$assetId',
+  path: '/twin/$assetId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/command': typeof CommandRoute
+  '/fleet': typeof FleetRoute
+  '/maintenance': typeof MaintenanceRoute
+  '/incidents/$incidentId': typeof IncidentsIncidentIdRoute
+  '/twin/$assetId': typeof TwinAssetIdRoute
+  '/incidents/': typeof IncidentsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/command': typeof CommandRoute
+  '/fleet': typeof FleetRoute
+  '/maintenance': typeof MaintenanceRoute
+  '/incidents/$incidentId': typeof IncidentsIncidentIdRoute
+  '/twin/$assetId': typeof TwinAssetIdRoute
+  '/incidents': typeof IncidentsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/command': typeof CommandRoute
+  '/fleet': typeof FleetRoute
+  '/maintenance': typeof MaintenanceRoute
+  '/incidents/$incidentId': typeof IncidentsIncidentIdRoute
+  '/twin/$assetId': typeof TwinAssetIdRoute
+  '/incidents/': typeof IncidentsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/command'
+    | '/fleet'
+    | '/maintenance'
+    | '/incidents/$incidentId'
+    | '/twin/$assetId'
+    | '/incidents/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/command'
+    | '/fleet'
+    | '/maintenance'
+    | '/incidents/$incidentId'
+    | '/twin/$assetId'
+    | '/incidents'
+  id:
+    | '__root__'
+    | '/'
+    | '/command'
+    | '/fleet'
+    | '/maintenance'
+    | '/incidents/$incidentId'
+    | '/twin/$assetId'
+    | '/incidents/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CommandRoute: typeof CommandRoute
+  FleetRoute: typeof FleetRoute
+  MaintenanceRoute: typeof MaintenanceRoute
+  IncidentsIncidentIdRoute: typeof IncidentsIncidentIdRoute
+  TwinAssetIdRoute: typeof TwinAssetIdRoute
+  IncidentsIndexRoute: typeof IncidentsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +130,59 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/command': {
+      id: '/command'
+      path: '/command'
+      fullPath: '/command'
+      preLoaderRoute: typeof CommandRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fleet': {
+      id: '/fleet'
+      path: '/fleet'
+      fullPath: '/fleet'
+      preLoaderRoute: typeof FleetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/maintenance': {
+      id: '/maintenance'
+      path: '/maintenance'
+      fullPath: '/maintenance'
+      preLoaderRoute: typeof MaintenanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/incidents/': {
+      id: '/incidents/'
+      path: '/incidents'
+      fullPath: '/incidents/'
+      preLoaderRoute: typeof IncidentsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/incidents/$incidentId': {
+      id: '/incidents/$incidentId'
+      path: '/incidents/$incidentId'
+      fullPath: '/incidents/$incidentId'
+      preLoaderRoute: typeof IncidentsIncidentIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/twin/$assetId': {
+      id: '/twin/$assetId'
+      path: '/twin/$assetId'
+      fullPath: '/twin/$assetId'
+      preLoaderRoute: typeof TwinAssetIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CommandRoute: CommandRoute,
+  FleetRoute: FleetRoute,
+  MaintenanceRoute: MaintenanceRoute,
+  IncidentsIncidentIdRoute: IncidentsIncidentIdRoute,
+  TwinAssetIdRoute: TwinAssetIdRoute,
+  IncidentsIndexRoute: IncidentsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
